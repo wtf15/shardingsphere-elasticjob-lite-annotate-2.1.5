@@ -23,6 +23,7 @@ public final class LiteJob implements Job {
     
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
+        // >>>>>>>>> getJobExecutor execute
         JobExecutorFactory.getJobExecutor(elasticJob, jobFacade).execute();
     }
 }

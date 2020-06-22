@@ -106,17 +106,20 @@ public class JobScheduler {
         //  设置分片数
         JobRegistry.getInstance().setCurrentShardingTotalCount(liteJobConfigFromRegCenter.getJobName(), liteJobConfigFromRegCenter.getTypeConfig().getCoreConfig().getShardingTotalCount());
         // 构建任务，创建调度器
+        // createJobDetail>>>>>>>>>
         JobScheduleController jobScheduleController = new JobScheduleController(
                 createScheduler(), createJobDetail(liteJobConfigFromRegCenter.getTypeConfig().getJobClass()), liteJobConfigFromRegCenter.getJobName());
         // 在ZK上注册任务
         JobRegistry.getInstance().registerJob(liteJobConfigFromRegCenter.getJobName(), jobScheduleController, regCenter);
         // 添加任务信息并进行节点选举
+        // >>>>>>>>>
         schedulerFacade.registerStartUpInfo(!liteJobConfigFromRegCenter.isDisabled());
         // 启动调度器
         jobScheduleController.scheduleJob(liteJobConfigFromRegCenter.getTypeConfig().getCoreConfig().getCron());
     }
     
     private JobDetail createJobDetail(final String jobClass) {
+        // LiteJob>>>>>>>>
         JobDetail result = JobBuilder.newJob(LiteJob.class).withIdentity(liteJobConfig.getJobName()).build();
         result.getJobDataMap().put(JOB_FACADE_DATA_MAP_KEY, jobFacade);
         Optional<ElasticJob> elasticJobInstance = createElasticJobInstance();

@@ -119,6 +119,7 @@ public abstract class AbstractElasticJobExecutor {
             //CHECKSTYLE:ON
             jobExceptionHandler.handleException(jobName, cause);
         }
+        // >>>>>>>>>
         execute(shardingContexts, JobExecutionEvent.ExecutionSource.NORMAL_TRIGGER);
         while (jobFacade.isExecuteMisfired(shardingContexts.getShardingItemParameters().keySet())) {
             jobFacade.clearMisfire(shardingContexts.getShardingItemParameters().keySet());
@@ -147,6 +148,7 @@ public abstract class AbstractElasticJobExecutor {
             jobFacade.postJobStatusTraceEvent(taskId, State.TASK_RUNNING, "");
         }
         try {
+            // >>>>>>>>>
             process(shardingContexts, executionSource);
         } finally {
             // TODO 考虑增加作业失败的状态，并且考虑如何处理作业失败的整体回路
@@ -182,6 +184,7 @@ public abstract class AbstractElasticJobExecutor {
                 @Override
                 public void run() {
                     try {
+                        // >>>>>>>>>
                         process(shardingContexts, each, jobExecutionEvent);
                     } finally {
                         latch.countDown();
@@ -203,6 +206,7 @@ public abstract class AbstractElasticJobExecutor {
         log.trace("Job '{}' executing, item is: '{}'.", jobName, item);
         JobExecutionEvent completeEvent;
         try {
+            // >>>>>>>>>
             process(new ShardingContext(shardingContexts, item));
             completeEvent = startEvent.executionSuccess();
             log.trace("Job '{}' executed, item is: '{}'.", jobName, item);
