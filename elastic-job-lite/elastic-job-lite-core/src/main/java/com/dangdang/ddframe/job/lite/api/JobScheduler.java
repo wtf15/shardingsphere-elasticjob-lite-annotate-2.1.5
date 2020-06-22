@@ -103,7 +103,7 @@ public class JobScheduler {
      */
     public void init() {
         LiteJobConfiguration liteJobConfigFromRegCenter = schedulerFacade.updateJobConfiguration(liteJobConfig);
-        // 设置分片数
+        //  设置分片数
         JobRegistry.getInstance().setCurrentShardingTotalCount(liteJobConfigFromRegCenter.getJobName(), liteJobConfigFromRegCenter.getTypeConfig().getCoreConfig().getShardingTotalCount());
         // 构建任务，创建调度器
         JobScheduleController jobScheduleController = new JobScheduleController(

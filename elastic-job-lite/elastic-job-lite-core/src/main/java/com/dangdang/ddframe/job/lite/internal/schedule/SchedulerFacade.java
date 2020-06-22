@@ -112,11 +112,17 @@ public final class SchedulerFacade {
     public void registerStartUpInfo(final boolean enabled) {
         // 启动所有的监听器
         listenerManager.startAllListeners();
+        // 节点选举
         leaderService.electLeader();
+        // 服务信息持久化(写到 ZK)
         serverService.persistOnline(enabled);
+        // 实例信息持久化(写到 ZK)
         instanceService.persistOnline();
+        // 重新分片
         shardingService.setReshardingFlag();
+        // 监控信息监听器
         monitorService.listen();
+        // 自诊断修复，使本地节点与 ZK 数据一致
         if (!reconcileService.isRunning()) {
             reconcileService.startAsync();
         }
