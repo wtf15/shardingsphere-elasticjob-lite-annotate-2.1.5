@@ -83,7 +83,9 @@ public final class FailoverListenerManager extends AbstractListenerManager {
                 List<Integer> failoverItems = failoverService.getFailoverItems(jobInstanceId);
                 if (!failoverItems.isEmpty()) {
                     for (int each : failoverItems) {
+                        // 设置失效的分片项标记
                         failoverService.setCrashedFailoverFlag(each);
+                        // >>>>>>>>>
                         failoverService.failoverIfNecessary();
                     }
                 } else {

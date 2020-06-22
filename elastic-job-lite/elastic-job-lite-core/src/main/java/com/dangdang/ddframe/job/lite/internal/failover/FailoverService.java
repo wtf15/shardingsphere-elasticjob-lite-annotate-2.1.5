@@ -70,12 +70,16 @@ public final class FailoverService {
      * 如果需要失效转移, 则执行作业失效转移.
      */
     public void failoverIfNecessary() {
+        // >>>>>>>>>
         if (needFailover()) {
+            // >>>>>>>>>
             jobNodeStorage.executeInLeader(FailoverNode.LATCH, new FailoverLeaderExecutionCallback());
         }
     }
     
     private boolean needFailover() {
+        // 有失效转移的作业分片项
+        // 当前作业不在运行中
         return jobNodeStorage.isJobNodeExisted(FailoverNode.ITEMS_ROOT) && !jobNodeStorage.getJobNodeChildrenKeys(FailoverNode.ITEMS_ROOT).isEmpty()
                 && !JobRegistry.getInstance().isJobRunning(jobName);
     }
@@ -152,16 +156,21 @@ public final class FailoverService {
         
         @Override
         public void execute() {
+            // 判断是否需要失效转移
             if (JobRegistry.getInstance().isShutdown(jobName) || !needFailover()) {
                 return;
             }
+            // 从${JOB_NAME}/leader/failover/items/${ITEM_ID}获得一个分片项
             int crashedItem = Integer.parseInt(jobNodeStorage.getJobNodeChildrenKeys(FailoverNode.ITEMS_ROOT).get(0));
             log.debug("Failover job '{}' begin, crashed item '{}'", jobName, crashedItem);
+            // 在注册中心节点`${JOB_NAME}/sharding/${ITEM_ID}/failover`注册作业分片项为当前作业节点
             jobNodeStorage.fillEphemeralJobNode(FailoverNode.getExecutionFailoverNode(crashedItem), JobRegistry.getInstance().getJobInstance(jobName).getJobInstanceId());
+            // 移除任务转移分片项
             jobNodeStorage.removeJobNodeIfExisted(FailoverNode.getItemsNode(crashedItem));
             // TODO 不应使用triggerJob, 而是使用executor统一调度
             JobScheduleController jobScheduleController = JobRegistry.getInstance().getJobScheduleController(jobName);
             if (null != jobScheduleController) {
+                // 提交任务
                 jobScheduleController.triggerJob();
             }
         }
